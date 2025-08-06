@@ -9,6 +9,7 @@ import { DatasetUpload } from './DatasetUpload';
 import { TrainingConfig } from './TrainingConfig';
 import { TrainingProgress } from './TrainingProgress';
 import { PythonCodeDisplay } from './PythonCodeDisplay';
+import { SeverityClassification } from './SeverityClassification';
 
 interface TrainingParams {
   epochs: number;
@@ -72,7 +73,7 @@ export const YOLOTraining = () => {
 
       <div className="max-w-7xl mx-auto p-8">
         <Tabs defaultValue="dataset" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="dataset" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
               Dataset
@@ -84,6 +85,10 @@ export const YOLOTraining = () => {
             <TabsTrigger value="training" className="flex items-center gap-2">
               <Play className="h-4 w-4" />
               Training
+            </TabsTrigger>
+            <TabsTrigger value="severity" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Severity Analysis
             </TabsTrigger>
             <TabsTrigger value="code" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
@@ -113,6 +118,10 @@ export const YOLOTraining = () => {
               onStartTraining={handleStartTraining}
               params={trainingParams}
             />
+          </TabsContent>
+
+          <TabsContent value="severity">
+            <SeverityClassification />
           </TabsContent>
 
           <TabsContent value="code">
