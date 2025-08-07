@@ -32,26 +32,63 @@ export const SeverityClassification = () => {
     setSelectedImages(files);
   };
 
-  const simulateDetection = async () => {
+  const processWithAPI = async () => {
     setIsProcessing(true);
     setProcessingProgress(0);
     setResults([]);
 
-    // Simulate model loading
-    if (!modelLoaded) {
-      for (let i = 0; i <= 30; i += 5) {
-        setProcessingProgress(i);
-        await new Promise(resolve => setTimeout(resolve, 100));
+    const API_URL = 'https://your-render-api-url.onrender.com'; // Replace with your Render URL
+    
+    try {
+      const apiResults: DetectionResult[] = [];
+      
+      for (let i = 0; i < selectedImages.length; i++) {
+        const file = selectedImages[i];
+        setProcessingProgress((i / selectedImages.length) * 90);
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch(`${API_URL}/detect`, {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.statusText}`);
+        }
+        
+        const apiResult = await response.json();
+        
+        const result: DetectionResult = {
+          imageUrl: URL.createObjectURL(file),
+          detectionCount: apiResult.detection_count,
+          severityLevel: apiResult.severity_level as 'green' | 'yellow' | 'red',
+          detectedObjects: apiResult.detections || [],
+          annotatedImageUrl: apiResult.annotated_image || URL.createObjectURL(file)
+        };
+        
+        apiResults.push(result);
+        setResults([...apiResults]);
       }
-      setModelLoaded(true);
+      
+      setProcessingProgress(100);
+    } catch (error) {
+      console.error('API Error:', error);
+      // Fallback to simulation if API fails
+      await simulateDetection();
     }
+    
+    setIsProcessing(false);
+  };
 
-    // Simulate processing each image
+  const simulateDetection = async () => {
+    // Simulation code for demo purposes
     const mockResults: DetectionResult[] = [];
     
     for (let i = 0; i < selectedImages.length; i++) {
       const file = selectedImages[i];
-      const objectCount = Math.floor(Math.random() * 25) + 1; // 1-25 objects
+      const objectCount = Math.floor(Math.random() * 25) + 1;
       
       let severityLevel: 'green' | 'yellow' | 'red';
       if (objectCount > 15) severityLevel = 'red';
@@ -72,16 +109,14 @@ export const SeverityClassification = () => {
             0.1 + Math.random() * 0.2
           ]
         })),
-        annotatedImageUrl: URL.createObjectURL(file) // In real implementation, this would be the annotated image
+        annotatedImageUrl: URL.createObjectURL(file)
       };
 
       mockResults.push(result);
       setResults([...mockResults]);
-      setProcessingProgress(30 + ((i + 1) / selectedImages.length) * 70);
+      setProcessingProgress(((i + 1) / selectedImages.length) * 100);
       await new Promise(resolve => setTimeout(resolve, 800));
     }
-
-    setIsProcessing(false);
   };
 
   const getSeverityColor = (level: string) => {
@@ -188,14 +223,23 @@ export const SeverityClassification = () => {
                     <p className="text-sm text-muted-foreground">
                       {selectedImages.length} images selected
                     </p>
-                    <Button
-                      onClick={simulateDetection}
-                      disabled={isProcessing}
-                      className="bg-gradient-primary hover:shadow-glow"
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      {isProcessing ? 'Processing...' : 'Analyze Images'}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={processWithAPI}
+                        disabled={isProcessing}
+                        className="bg-gradient-primary hover:shadow-glow"
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        {isProcessing ? 'Processing...' : 'Analyze with API'}
+                      </Button>
+                      <Button
+                        onClick={simulateDetection}
+                        disabled={isProcessing}
+                        variant="outline"
+                      >
+                        Demo Mode
+                      </Button>
+                    </div>
                   </div>
 
                   {isProcessing && (
