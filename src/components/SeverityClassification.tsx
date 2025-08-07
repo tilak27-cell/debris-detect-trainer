@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { Upload, AlertTriangle, CheckCircle, AlertCircle, Image as ImageIcon, Download, Play } from 'lucide-react';
+import { AlertTriangle, CheckCircle, AlertCircle, Waves, Download, Play, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SeverityCodeDisplay } from './SeverityCodeDisplay';
+import { WaterBackground } from './WaterBackground';
+import { AnimatedUpload } from './AnimatedUpload';
+import { ScanningAnimation } from './ScanningAnimation';
+import { SeverityResultCard } from './SeverityResultCard';
 
 interface DetectionResult {
   imageUrl: string;
@@ -27,8 +29,7 @@ export const SeverityClassification = () => {
   const [results, setResults] = useState<DetectionResult[]>([]);
   const [modelLoaded, setModelLoaded] = useState(false);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+  const handleImageUpload = (files: File[]) => {
     setSelectedImages(files);
   };
 
@@ -175,209 +176,239 @@ export const SeverityClassification = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="detection" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="detection">Detection & Classification</TabsTrigger>
-          <TabsTrigger value="code">Python Implementation</TabsTrigger>
-        </TabsList>
+    <div className="relative min-h-screen">
+      <WaterBackground />
+      
+      <div className="relative z-10 space-y-8 max-w-7xl mx-auto p-6">
+        {/* Header */}
+        <div className="text-center py-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Waves className="h-10 w-10 text-primary animate-float" />
+            <h1 className="text-4xl font-bold bg-gradient-ocean bg-clip-text text-transparent">
+              Marine Debris Detection
+            </h1>
+            <Sparkles className="h-8 w-8 text-primary/60 animate-float" style={{ animationDelay: '1s' }} />
+          </div>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            AI-powered ocean satellite imagery analysis for marine conservation
+          </p>
+        </div>
 
-        <TabsContent value="detection" className="space-y-6">
-          {/* Upload Section */}
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImageIcon className="h-5 w-5" />
-                Severity Classification System
-              </CardTitle>
-              <CardDescription>
-                Upload satellite images to detect marine debris and classify pollution severity
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-primary/50 transition-all">
-                <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Upload Satellite Images</h3>
-                <p className="text-muted-foreground mb-4">
-                  Select multiple images for batch processing
-                </p>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  className="hidden"
-                  id="image-upload"
-                  onChange={handleImageUpload}
+        <Tabs defaultValue="detection" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-2 bg-white/80 shadow-water">
+            <TabsTrigger value="detection" className="data-[state=active]:bg-gradient-ocean data-[state=active]:text-white">
+              Detection & Classification
+            </TabsTrigger>
+            <TabsTrigger value="code" className="data-[state=active]:bg-gradient-ocean data-[state=active]:text-white">
+              Python Implementation
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="detection" className="space-y-8">
+            {/* Upload Section */}
+            <Card className="shadow-water border-0 bg-white/90 backdrop-blur-sm">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="flex items-center justify-center gap-3 text-2xl">
+                  <Waves className="h-6 w-6 text-primary" />
+                  Ocean Imagery Analysis
+                </CardTitle>
+                <CardDescription className="text-lg">
+                  Upload satellite images to detect marine debris and classify pollution severity
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <AnimatedUpload 
+                  onFileUpload={handleImageUpload}
+                  isProcessing={isProcessing}
+                  selectedCount={selectedImages.length}
                 />
-                <Button
-                  variant="outline"
-                  onClick={() => document.getElementById('image-upload')?.click()}
-                >
-                  Select Images
-                </Button>
-              </div>
 
-              {selectedImages.length > 0 && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      {selectedImages.length} images selected
-                    </p>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={processWithAPI}
-                        disabled={isProcessing}
-                        className="bg-gradient-primary hover:shadow-glow"
-                      >
-                        <Play className="h-4 w-4 mr-2" />
-                        {isProcessing ? 'Processing...' : 'Analyze with API'}
-                      </Button>
-                      <Button
-                        onClick={simulateDetection}
-                        disabled={isProcessing}
-                        variant="outline"
-                      >
-                        Demo Mode
-                      </Button>
-                    </div>
-                  </div>
-
-                  {isProcessing && (
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>{modelLoaded ? 'Processing images...' : 'Loading model...'}</span>
-                        <span>{processingProgress.toFixed(0)}%</span>
+                {selectedImages.length > 0 && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-gradient-water rounded-xl border border-primary/20">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                          <CheckCircle className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{selectedImages.length} Images Ready</p>
+                          <p className="text-sm text-muted-foreground">
+                            Ready for marine debris analysis
+                          </p>
+                        </div>
                       </div>
-                      <Progress value={processingProgress} className="h-2" />
+                      <div className="flex gap-3">
+                        <Button
+                          onClick={processWithAPI}
+                          disabled={isProcessing}
+                          className="bg-gradient-ocean hover:shadow-glow shadow-water"
+                        >
+                          <Play className="h-4 w-4 mr-2" />
+                          {isProcessing ? 'Analyzing...' : 'Start Analysis'}
+                        </Button>
+                        <Button
+                          onClick={simulateDetection}
+                          disabled={isProcessing}
+                          variant="outline"
+                          className="border-primary/20 hover:bg-gradient-water"
+                        >
+                          Demo Mode
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
 
-          {/* Severity Rules */}
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle>Classification Rules</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <CheckCircle className="h-8 w-8 text-green-600" />
-                  <div>
-                    <p className="font-semibold text-green-800">GREEN</p>
-                    <p className="text-sm text-green-600">≤ 5 objects detected</p>
-                    <p className="text-xs text-green-500">Low pollution level</p>
+                    {isProcessing && (
+                      <ScanningAnimation 
+                        progress={processingProgress} 
+                        isActive={isProcessing}
+                      />
+                    )}
                   </div>
-                </div>
-                <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <AlertCircle className="h-8 w-8 text-yellow-600" />
-                  <div>
-                    <p className="font-semibold text-yellow-800">YELLOW</p>
-                    <p className="text-sm text-yellow-600">6-15 objects detected</p>
-                    <p className="text-xs text-yellow-500">Moderate pollution level</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertTriangle className="h-8 w-8 text-red-600" />
-                  <div>
-                    <p className="font-semibold text-red-800">RED</p>
-                    <p className="text-sm text-red-600">&gt; 15 objects detected</p>
-                    <p className="text-xs text-red-500">Critical pollution level</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                )}
+              </CardContent>
+            </Card>
 
-          {/* Results */}
-          {results.length > 0 && (
-            <Card className="shadow-soft">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Analysis Results</CardTitle>
-                  <CardDescription>
-                    {results.length} images processed with severity classification
-                  </CardDescription>
-                </div>
-                <Button variant="outline" onClick={exportResults}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Report
-                </Button>
+            {/* Severity Rules */}
+            <Card className="shadow-water border-0 bg-white/90 backdrop-blur-sm">
+              <CardHeader className="text-center">
+                <CardTitle className="flex items-center justify-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-primary" />
+                  Pollution Classification System
+                </CardTitle>
+                <CardDescription>
+                  AI-driven severity assessment based on debris density
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Summary Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                  <Card className="bg-muted/30">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold">{results.length}</div>
-                      <p className="text-sm text-muted-foreground">Images Analyzed</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-red-50 border-red-200">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-red-600">
-                        {results.filter(r => r.severityLevel === 'red').length}
-                      </div>
-                      <p className="text-sm text-red-600">Critical Areas</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-yellow-50 border-yellow-200">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-yellow-600">
-                        {results.filter(r => r.severityLevel === 'yellow').length}
-                      </div>
-                      <p className="text-sm text-yellow-600">Moderate Areas</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-green-50 border-green-200">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-green-600">
-                        {results.filter(r => r.severityLevel === 'green').length}
-                      </div>
-                      <p className="text-sm text-green-600">Clean Areas</p>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Individual Results */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {results.map((result, index) => (
-                    <Card key={index} className={`border-2 ${getSeverityColor(result.severityLevel)}`}>
-                      <CardContent className="p-4">
-                        <div className="aspect-video bg-muted rounded-lg mb-3 overflow-hidden">
-                          <img
-                            src={result.imageUrl}
-                            alt={`Analysis result ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex items-center gap-2 mb-2">
-                          {getSeverityIcon(result.severityLevel)}
-                          <Badge variant="secondary" className={getSeverityColor(result.severityLevel)}>
-                            {result.severityLevel.toUpperCase()}
-                          </Badge>
-                        </div>
-                        <p className="text-sm font-medium mb-1">
-                          {getSeverityMessage(result.severityLevel, result.detectionCount)}
-                        </p>
-                        <div className="text-xs text-muted-foreground">
-                          Detected classes: {[...new Set(result.detectedObjects.map(obj => obj.class))].join(', ')}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="group relative p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl shadow-water hover:shadow-glow transition-all duration-300">
+                    <div className="absolute top-4 right-4">
+                      <div className="h-3 w-3 bg-severity-green rounded-full animate-pulse" />
+                    </div>
+                    <CheckCircle className="h-12 w-12 text-severity-green mb-4 group-hover:animate-bounce-in" />
+                    <div className="space-y-2">
+                      <p className="text-xl font-bold text-green-800">CLEAN OCEAN</p>
+                      <p className="text-green-700 font-medium">≤ 5 objects detected</p>
+                      <p className="text-sm text-green-600">Minimal marine debris presence</p>
+                    </div>
+                  </div>
+                  
+                  <div className="group relative p-6 bg-gradient-to-br from-yellow-50 to-amber-50 border-2 border-yellow-200 rounded-2xl shadow-water hover:shadow-glow transition-all duration-300">
+                    <div className="absolute top-4 right-4">
+                      <div className="h-3 w-3 bg-severity-yellow rounded-full animate-pulse" />
+                    </div>
+                    <AlertCircle className="h-12 w-12 text-severity-yellow mb-4 group-hover:animate-bounce-in" />
+                    <div className="space-y-2">
+                      <p className="text-xl font-bold text-yellow-800">MODERATE POLLUTION</p>
+                      <p className="text-yellow-700 font-medium">6-15 objects detected</p>
+                      <p className="text-sm text-yellow-600">Requires monitoring & cleanup</p>
+                    </div>
+                  </div>
+                  
+                  <div className="group relative p-6 bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-200 rounded-2xl shadow-water hover:shadow-glow transition-all duration-300">
+                    <div className="absolute top-4 right-4">
+                      <div className="h-3 w-3 bg-severity-red rounded-full animate-pulse" />
+                    </div>
+                    <AlertTriangle className="h-12 w-12 text-severity-red mb-4 group-hover:animate-bounce-in" />
+                    <div className="space-y-2">
+                      <p className="text-xl font-bold text-red-800">CRITICAL POLLUTION</p>
+                      <p className="text-red-700 font-medium">&gt; 15 objects detected</p>
+                      <p className="text-sm text-red-600">Urgent intervention required</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          )}
+
+            {/* Results */}
+            {results.length > 0 && (
+              <Card className="shadow-water border-0 bg-white/90 backdrop-blur-sm">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-full bg-gradient-ocean flex items-center justify-center">
+                      <Sparkles className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl">Analysis Complete</CardTitle>
+                      <CardDescription className="text-lg">
+                        {results.length} ocean areas analyzed for marine debris
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={exportResults}
+                    className="border-primary/20 hover:bg-gradient-water shadow-water"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Report
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                  {/* Summary Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <Card className="bg-gradient-water border-primary/20 shadow-water">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-primary mb-2">{results.length}</div>
+                        <p className="text-muted-foreground">Ocean Areas Scanned</p>
+                        <Waves className="h-6 w-6 text-primary/60 mx-auto mt-2 animate-float" />
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-gradient-to-br from-red-50 to-rose-50 border-red-200 shadow-water">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-severity-red mb-2">
+                          {results.filter(r => r.severityLevel === 'red').length}
+                        </div>
+                        <p className="text-red-600 font-medium">Critical Zones</p>
+                        <AlertTriangle className="h-6 w-6 text-severity-red mx-auto mt-2" />
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-water">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-severity-yellow mb-2">
+                          {results.filter(r => r.severityLevel === 'yellow').length}
+                        </div>
+                        <p className="text-yellow-600 font-medium">Moderate Areas</p>
+                        <AlertCircle className="h-6 w-6 text-severity-yellow mx-auto mt-2" />
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-water">
+                      <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-severity-green mb-2">
+                          {results.filter(r => r.severityLevel === 'green').length}
+                        </div>
+                        <p className="text-green-600 font-medium">Clean Waters</p>
+                        <CheckCircle className="h-6 w-6 text-severity-green mx-auto mt-2" />
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Individual Results */}
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-semibold text-center">Detailed Analysis Results</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {results.map((result, index) => (
+                        <SeverityResultCard
+                          key={index}
+                          result={result}
+                          index={index}
+                          isNew={false}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
         </TabsContent>
 
-        <TabsContent value="code">
-          <SeverityCodeDisplay />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="code">
+            <div className="relative">
+              <SeverityCodeDisplay />
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
