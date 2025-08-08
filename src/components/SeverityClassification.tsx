@@ -9,6 +9,7 @@ import { WaterBackground } from './WaterBackground';
 import { AnimatedUpload } from './AnimatedUpload';
 import { ScanningAnimation } from './ScanningAnimation';
 import { SeverityResultCard } from './SeverityResultCard';
+import { FloatingIcons } from './FloatingIcons';
 
 interface DetectionResult {
   imageUrl: string;
@@ -178,6 +179,7 @@ export const SeverityClassification = () => {
   return (
     <div className="relative min-h-screen">
       <WaterBackground />
+      <FloatingIcons />
       
       <div className="relative z-10 space-y-8 max-w-7xl mx-auto p-6">
         {/* Header */}

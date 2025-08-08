@@ -57,6 +57,11 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				severity: {
+					green: 'hsl(var(--severity-green))',
+					yellow: 'hsl(var(--severity-yellow))',
+					red: 'hsl(var(--severity-red))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -85,6 +90,11 @@ export default {
 				'glow': 'var(--shadow-glow)',
 				'water': 'var(--shadow-water)'
 			},
+			fontFamily: {
+				sans: ['Poppins', 'Quicksand', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				quicksand: ['Quicksand', 'ui-sans-serif', 'system-ui', 'sans-serif']
+			}
 			colors: {
 				...colors,
 				severity: {

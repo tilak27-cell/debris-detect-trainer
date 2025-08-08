@@ -25,19 +25,21 @@ export const ScanningAnimation = ({ progress, isActive }: ScanningAnimationProps
     <div className="relative w-full">
       {/* Main scanning container */}
       <div className="relative bg-gradient-ocean/10 rounded-2xl p-8 border border-primary/20 shadow-water">
-        {/* Radar animation */}
+        {/* Lottie scanning animation (fallback to radar if not loaded) */}
         <div className="flex items-center justify-center mb-6">
           <div className="relative">
-            <Radar className="h-16 w-16 text-primary animate-spin" style={{ animationDuration: '2s' }} />
-            
-            {/* Pulse rings */}
-            <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-pulse-ring" />
-            <div className="absolute inset-0 rounded-full border-2 border-primary/20 animate-pulse-ring" style={{ animationDelay: '0.5s' }} />
-            <div className="absolute inset-0 rounded-full border-2 border-primary/10 animate-pulse-ring" style={{ animationDelay: '1s' }} />
+            <lottie-player
+              autoplay
+              loop
+              mode="normal"
+              src="https://assets2.lottiefiles.com/packages/lf20_1pxqjqps.json"
+              style={{ width: 96, height: 96 }}
+            ></lottie-player>
+            {/* Fallback icon behind while lottie loads */}
+            <Radar className="h-16 w-16 text-primary absolute inset-0 m-auto opacity-20" />
           </div>
         </div>
 
-        {/* Scanning text */}
         <div className="text-center mb-6">
           <h3 className="text-lg font-semibold text-foreground mb-2 animate-fade-in-up">
             Scanning for Marine Debris

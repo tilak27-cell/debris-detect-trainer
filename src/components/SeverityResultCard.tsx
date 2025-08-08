@@ -124,13 +124,24 @@ export const SeverityResultCard = ({ result, index, isNew = false }: SeverityRes
       <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} opacity-30`} />
       
       <CardContent className="relative p-6">
-        {/* Image with bounding boxes */}
-        <div className="aspect-video bg-muted/20 rounded-xl mb-4 overflow-hidden shadow-inner">
-          <img
-            src={result.annotatedImageUrl || result.imageUrl}
-            alt={`Marine debris analysis ${index + 1}`}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-          />
+        {/* Image with bounding boxes - side by side */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div className="aspect-video bg-muted/20 rounded-xl overflow-hidden shadow-inner">
+            <img
+              src={result.imageUrl}
+              alt={`Original ocean image ${index + 1}`}
+              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              loading="lazy"
+            />
+          </div>
+          <div className="aspect-video bg-muted/20 rounded-xl overflow-hidden shadow-inner">
+            <img
+              src={result.annotatedImageUrl || result.imageUrl}
+              alt={`Detected debris result ${index + 1}`}
+              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              loading="lazy"
+            />
+          </div>
         </div>
 
         {/* Severity indicator */}
